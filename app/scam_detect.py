@@ -45,9 +45,10 @@ class Detector:
     def classify(self, msg: str) -> dict:
         probs = self.predict_proba([msg])[0]
         p = dict(zip(self.labels, probs))
+        top_label = max(p, key=p.get)
+        is_scam = top_label != 'legit'
         scam_score = 1 - p['legit']
-        is_scam = scam_score >= 0.5
-        label = max((l for l in p if l != 'legit'), key=p.get) if is_scam else 'legit'
+        label = top_label if is_scam else 'legit'
         return {
             'verdict': 'SCAM' if is_scam else 'NOT SCAM',
             'scam_score': round(float(scam_score), 4),
